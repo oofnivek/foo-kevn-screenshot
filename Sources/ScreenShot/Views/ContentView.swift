@@ -6,7 +6,7 @@ struct ContentView: View {
     @State private var shapes: [AnnotationShape] = []
     @State private var shapeType: AnnotationShapeType = .rectangle
     @State private var color: Color = .red
-    @State private var lineWidth: CGFloat = 3
+    @State private var lineWidth: CGFloat = 5
 
     var body: some View {
         VStack(spacing: 0) {
@@ -52,40 +52,56 @@ struct ContentView: View {
             Button {
                 takeScreenshot()
             } label: {
-                Label("New Screenshot", systemImage: "camera")
+                Image(systemName: "camera")
             }
             .keyboardShortcut("s", modifiers: [.command])
+            .help("New Screenshot")
 
             Picker("Shape", selection: $shapeType) {
                 ForEach(AnnotationShapeType.allCases) { type in
-                    Label(type.rawValue, systemImage: type.systemImage).tag(type)
+                    Image(systemName: type.systemImage)
+                        .tag(type)
                 }
             }
             .pickerStyle(.segmented)
-            .frame(width: 200)
+            .fixedSize()
+            .help(shapeType.rawValue)
 
             ColorPicker("Color", selection: $color)
-                .frame(width: 140)
+                .fixedSize()
 
-            HStack {
+            HStack(spacing: 16) {
                 Text("Width")
                 Slider(value: $lineWidth, in: 1...20)
-                    .frame(width: 120)
+                    .frame(width: 80)
                 Text("\(Int(lineWidth))")
                     .frame(width: 20)
                     .monospacedDigit()
             }
 
-            Spacer()
+            Button {
+                undo()
+            } label: {
+                Image(systemName: "arrow.uturn.backward")
+            }
+            .keyboardShortcut("z", modifiers: [.command])
+            .disabled(shapes.isEmpty)
+            .help("Undo")
 
             Button(role: .destructive) {
                 shapes.removeAll()
             } label: {
-                Label("Clear", systemImage: "trash")
+                Image(systemName: "trash")
             }
             .disabled(shapes.isEmpty)
+            .help("Clear")
         }
         .padding(12)
+    }
+
+    private func undo() {
+        guard !shapes.isEmpty else { return }
+        shapes.removeLast()
     }
 
     private func takeScreenshot() {
