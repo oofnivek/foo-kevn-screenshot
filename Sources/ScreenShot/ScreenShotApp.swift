@@ -6,6 +6,7 @@ struct ScreenShotApp: App {
         WindowGroup {
             ContentView()
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: 640, height: 480)
     }
 }

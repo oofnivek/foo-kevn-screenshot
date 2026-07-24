@@ -24,7 +24,12 @@ struct ContentView: View {
                 emptyState
             }
         }
-        .frame(minWidth: 900, minHeight: 650)
+        .frame(minWidth: 300, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                NSApplication.shared.windows.first?.setContentSize(NSSize(width: 640, height: 480))
+            }
+        }
     }
 
     private var emptyState: some View {
