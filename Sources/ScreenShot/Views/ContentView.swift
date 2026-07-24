@@ -50,7 +50,7 @@ struct ContentView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 10) {
             Button {
                 takeScreenshot()
             } label: {
@@ -58,6 +58,7 @@ struct ContentView: View {
             }
             .keyboardShortcut("s", modifiers: [.command])
             .help("New Screenshot")
+            .frame(height: 24)
 
             Picker("Shape", selection: $shapeType) {
                 ForEach(AnnotationShapeType.allCases) { type in
@@ -66,20 +67,25 @@ struct ContentView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .labelsHidden()
             .fixedSize()
             .help(shapeType.rawValue)
+            .frame(height: 24)
 
             ColorPicker("Color", selection: $color)
+                .labelsHidden()
                 .fixedSize()
+                .frame(height: 24)
 
-            HStack(spacing: 16) {
-                Text("Width")
+            HStack(spacing: 10) {
                 Slider(value: $lineWidth, in: 1...20)
-                    .frame(width: 80)
+                    .frame(width: 60)
                 Text("\(Int(lineWidth))")
                     .frame(width: 20)
                     .monospacedDigit()
             }
+            .help("Width")
+            .frame(height: 24)
 
             Button {
                 undo()
@@ -89,6 +95,7 @@ struct ContentView: View {
             .keyboardShortcut("z", modifiers: [.command])
             .disabled(shapes.isEmpty)
             .help("Undo")
+            .frame(height: 24)
 
             Button(role: .destructive) {
                 shapes.removeAll()
@@ -97,6 +104,7 @@ struct ContentView: View {
             }
             .disabled(shapes.isEmpty)
             .help("Clear")
+            .frame(height: 24)
 
             Button {
                 copyToClipboard()
@@ -105,6 +113,7 @@ struct ContentView: View {
             }
             .keyboardShortcut("c", modifiers: [.command, .shift])
             .help("Copy to Clipboard")
+            .frame(height: 24)
 
             Button {
                 saveToFile()
@@ -113,8 +122,9 @@ struct ContentView: View {
             }
             .keyboardShortcut("s", modifiers: [.command, .shift])
             .help("Save As…")
+            .frame(height: 24)
         }
-        .padding(12)
+        .padding(8)
     }
 
     private func undo() {
