@@ -1,5 +1,19 @@
 import SwiftUI
 
+func pathFor(type: AnnotationShapeType, rect: CGRect) -> Path {
+    switch type {
+    case .rectangle: return Path(rect)
+    case .oval: return Path(ellipseIn: rect)
+    }
+}
+
+struct CanvasDisplaySizeKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
+    }
+}
+
 struct AnnotationCanvasView: View {
     let image: NSImage
     @Binding var shapes: [AnnotationShape]
@@ -58,13 +72,7 @@ struct AnnotationCanvasView: View {
                 )
             }
             .frame(width: geo.size.width, height: geo.size.height)
-        }
-    }
-
-    private func pathFor(type: AnnotationShapeType, rect: CGRect) -> Path {
-        switch type {
-        case .rectangle: return Path(rect)
-        case .oval: return Path(ellipseIn: rect)
+            .preference(key: CanvasDisplaySizeKey.self, value: displaySize)
         }
     }
 

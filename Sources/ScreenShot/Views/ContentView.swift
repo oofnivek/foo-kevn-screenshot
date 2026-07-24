@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var shapeType: AnnotationShapeType = .rectangle
     @State private var color: Color = .red
     @State private var lineWidth: CGFloat = 5
+    @State private var canvasDisplaySize: CGSize = .zero
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,6 +21,7 @@ struct ContentView: View {
                     currentColor: color,
                     currentLineWidth: lineWidth
                 )
+                .onPreferenceChange(CanvasDisplaySizeKey.self) { canvasDisplaySize = $0 }
             } else {
                 emptyState
             }
@@ -95,6 +97,22 @@ struct ContentView: View {
             }
             .disabled(shapes.isEmpty)
             .help("Clear")
+
+            Button {
+                copyToClipboard()
+            } label: {
+                Image(systemName: "doc.on.doc")
+            }
+            .keyboardShortcut("c", modifiers: [.command, .shift])
+            .help("Copy to Clipboard")
+
+            Button {
+                saveToFile()
+            } label: {
+                Image(systemName: "square.and.arrow.down")
+            }
+            .keyboardShortcut("s", modifiers: [.command, .shift])
+            .help("Save As…")
         }
         .padding(12)
     }
@@ -102,6 +120,20 @@ struct ContentView: View {
     private func undo() {
         guard !shapes.isEmpty else { return }
         shapes.removeLast()
+    }
+
+    private func copyToClipboard() {
+        guard let screenshot,
+              let composed = ImageExport.composedImage(screenshot: screenshot, shapes: shapes, displaySize: canvasDisplaySize)
+        else { return }
+        ImageExport.copyToClipboard(composed)
+    }
+
+    private func saveToFile() {
+        guard let screenshot,
+              let composed = ImageExport.composedImage(screenshot: screenshot, shapes: shapes, displaySize: canvasDisplaySize)
+        else { return }
+        ImageExport.saveToFile(composed)
     }
 
     private func takeScreenshot() {
