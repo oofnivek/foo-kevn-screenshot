@@ -3,11 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>ScreenShot</string>
+	<string>Screenshot</string>
 	<key>CFBundleDisplayName</key>
-	<string>ScreenShot</string>
+	<string>Screenshot</string>
 	<key>CFBundleIdentifier</key>
 	<string>foo.kevn.screenshot</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>CFBundleShortVersionString</key>
