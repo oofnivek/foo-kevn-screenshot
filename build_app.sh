@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds ScreenShot and packages it into a proper, code-signed .app bundle.
+# Builds Screenshot and packages it into a proper, code-signed .app bundle.
 #
 # Signing with a stable local certificate (rather than swift build's default
 # ad-hoc signature) is what lets Screen Recording permission survive rebuilds:
@@ -10,9 +10,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 CONFIG="${1:-debug}"
-APP_NAME="ScreenShot"
+APP_NAME="Screenshot"
 BUNDLE_ID="foo.kevn.screenshot"
-SIGNING_IDENTITY="ScreenShot Dev"
+SIGNING_IDENTITY="Screenshot Dev"
 BUILD_DIR=".build/${CONFIG}"
 APP_BUNDLE="${BUILD_DIR}/${APP_NAME}.app"
 

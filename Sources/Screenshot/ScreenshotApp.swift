@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ScreenShotApp: App {
+struct ScreenshotApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
