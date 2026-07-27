@@ -84,14 +84,9 @@ final class SelectionOverlayView: NSView {
             onFinish?(nil)
             return
         }
-        // View-local coords → window-relative → global screen coords.
-        let screenRect = CGRect(
-            x: rect.minX + window!.frame.minX,
-            y: rect.minY + window!.frame.minY,
-            width: rect.width,
-            height: rect.height
-        )
-        onFinish?(screenRect)
+        // Reported in view-local coords; RegionSelector translates this to
+        // global screen coords using this view's own window's origin.
+        onFinish?(rect)
     }
 
     override func keyDown(with event: NSEvent) {

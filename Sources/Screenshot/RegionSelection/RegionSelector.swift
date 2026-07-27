@@ -1,30 +1,65 @@
 import AppKit
 
 /// Presents a full-desktop overlay so the user can drag-select an arbitrary
-/// rectangular region (spanning any screen). Returns the selection in Cocoa
-/// screen coordinates (origin bottom-left, y-up), or nil if cancelled.
+/// rectangular region on any connected display, then returns the selection
+/// in Cocoa screen coordinates (origin bottom-left, y-up), or nil if cancelled.
+///
+/// One borderless window is created per `NSScreen` rather than a single
+/// window spanning the union of all screens. With the (default) "Displays
+/// have separate Spaces" setting, macOS only renders a window on the one
+/// display/Space it's assigned to, so a single window whose frame spans two
+/// monitors would silently fail to appear on the second one.
 enum RegionSelector {
-    private static var activeWindow: SelectionOverlayWindow?
+    private static var activeWindows: [SelectionOverlayWindow] = []
 
     static func select(completion: @escaping (CGRect?) -> Void) {
-        let unionFrame = NSScreen.screens.reduce(CGRect.null) { $0.union($1.frame) }
-        guard !unionFrame.isEmpty else {
+        let screens = NSScreen.screens
+        guard !screens.isEmpty else {
             completion(nil)
             return
         }
 
-        let window = SelectionOverlayWindow(coveringFrame: unionFrame)
-        let view = SelectionOverlayView(frame: CGRect(origin: .zero, size: unionFrame.size))
-        view.onFinish = { rect in
-            activeWindow?.orderOut(nil)
-            activeWindow = nil
+        var finished = false
+        func finish(_ rect: CGRect?) {
+            guard !finished else { return }
+            finished = true
+            for window in activeWindows {
+                window.orderOut(nil)
+            }
+            activeWindows = []
             completion(rect)
         }
-        window.contentView = view
-        activeWindow = window
 
-        window.makeKeyAndOrderFront(nil)
-        window.makeFirstResponder(view)
+        let windows = screens.map { screen -> SelectionOverlayWindow in
+            let window = SelectionOverlayWindow(coveringFrame: screen.frame)
+            let view = SelectionOverlayView(frame: CGRect(origin: .zero, size: screen.frame.size))
+            view.onFinish = { localRect in
+                guard let localRect else {
+                    finish(nil)
+                    return
+                }
+                let screenRect = CGRect(
+                    x: localRect.minX + window.frame.minX,
+                    y: localRect.minY + window.frame.minY,
+                    width: localRect.width,
+                    height: localRect.height
+                )
+                finish(screenRect)
+            }
+            window.contentView = view
+            return window
+        }
+
+        activeWindows = windows
+        for window in windows {
+            window.orderFront(nil)
+        }
+        if let mainWindow = windows.first(where: { $0.screen == NSScreen.main }) ?? windows.first {
+            mainWindow.makeKeyAndOrderFront(nil)
+            if let view = mainWindow.contentView as? SelectionOverlayView {
+                mainWindow.makeFirstResponder(view)
+            }
+        }
         NSCursor.crosshair.set()
     }
 }
