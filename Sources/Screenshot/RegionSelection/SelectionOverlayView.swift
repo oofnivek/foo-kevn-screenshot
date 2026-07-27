@@ -63,7 +63,12 @@ final class SelectionOverlayView: NSView {
         text.draw(at: labelOrigin, withAttributes: attrs)
     }
 
+    override func mouseMoved(with event: NSEvent) {
+        NSCursor.crosshair.set()
+    }
+
     override func mouseDown(with event: NSEvent) {
+        NSCursor.crosshair.set()
         dragStart = convert(event.locationInWindow, from: nil)
         dragCurrent = dragStart
         needsDisplay = true
@@ -96,6 +101,12 @@ final class SelectionOverlayView: NSView {
     }
 
     override var acceptsFirstResponder: Bool { true }
+
+    // A click on whichever overlay window isn't yet key would otherwise
+    // just activate that window (becoming key) without registering as a
+    // real mouseDown — so the very first click on the "other" screen would
+    // do nothing. Forward it as a genuine click instead.
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     override func resetCursorRects() {
         addCursorRect(bounds, cursor: .crosshair)

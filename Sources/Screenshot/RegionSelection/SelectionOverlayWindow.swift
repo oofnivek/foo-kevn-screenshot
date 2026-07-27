@@ -18,6 +18,11 @@ final class SelectionOverlayWindow: NSWindow {
         backgroundColor = .clear
         hasShadow = false
         ignoresMouseEvents = false
+        // Needed so this window gets mouseMoved: even while another of our
+        // overlay windows (on a different screen) is the key window — the
+        // crosshair cursor is set from mouseMoved rather than relying on
+        // cursor rects, which only reliably refresh for the key window.
+        acceptsMouseMovedEvents = true
         level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         isReleasedWhenClosed = false
