@@ -35,7 +35,8 @@ struct AnnotationCanvasView: View {
 
                 Canvas { context, _ in
                     for shape in shapes {
-                        let path = pathFor(type: shape.type, rect: shape.rect)
+                        let rect = shape.rect.scaled(by: displaySize)
+                        let path = pathFor(type: shape.type, rect: rect)
                         context.stroke(path, with: .color(shape.color), lineWidth: shape.lineWidth)
                     }
                     if let start = dragStart, let current = dragCurrent {
@@ -59,7 +60,7 @@ struct AnnotationCanvasView: View {
                                     shapes.append(
                                         AnnotationShape(
                                             type: currentType,
-                                            rect: rect,
+                                            rect: rect.normalized(by: displaySize),
                                             color: currentColor,
                                             lineWidth: currentLineWidth
                                         )
@@ -93,6 +94,25 @@ private extension CGRect {
             y: min(start.y, end.y),
             width: abs(end.x - start.x),
             height: abs(end.y - start.y)
+        )
+    }
+
+    func normalized(by size: CGSize) -> CGRect {
+        guard size.width > 0, size.height > 0 else { return self }
+        return CGRect(
+            x: origin.x / size.width,
+            y: origin.y / size.height,
+            width: width / size.width,
+            height: height / size.height
+        )
+    }
+
+    func scaled(by size: CGSize) -> CGRect {
+        CGRect(
+            x: origin.x * size.width,
+            y: origin.y * size.height,
+            width: width * size.width,
+            height: height * size.height
         )
     }
 }

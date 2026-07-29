@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 private struct ComposedAnnotationView: View {
     let image: NSImage
     let shapes: [AnnotationShape]
-    let scale: CGFloat
+    let lineWidthScale: CGFloat
 
     var body: some View {
         ZStack {
@@ -13,13 +13,13 @@ private struct ComposedAnnotationView: View {
             Canvas { context, _ in
                 for shape in shapes {
                     let rect = CGRect(
-                        x: shape.rect.origin.x * scale,
-                        y: shape.rect.origin.y * scale,
-                        width: shape.rect.width * scale,
-                        height: shape.rect.height * scale
+                        x: shape.rect.origin.x * image.size.width,
+                        y: shape.rect.origin.y * image.size.height,
+                        width: shape.rect.width * image.size.width,
+                        height: shape.rect.height * image.size.height
                     )
                     let path = pathFor(type: shape.type, rect: rect)
-                    context.stroke(path, with: .color(shape.color), lineWidth: shape.lineWidth * scale)
+                    context.stroke(path, with: .color(shape.color), lineWidth: shape.lineWidth * lineWidthScale)
                 }
             }
         }
@@ -30,9 +30,9 @@ private struct ComposedAnnotationView: View {
 @MainActor
 enum ImageExport {
     static func composedImage(screenshot: NSImage, shapes: [AnnotationShape], displaySize: CGSize) -> NSImage? {
-        let scale = displaySize.width > 0 ? screenshot.size.width / displaySize.width : 1
+        let lineWidthScale = displaySize.width > 0 ? screenshot.size.width / displaySize.width : 1
         let renderer = ImageRenderer(
-            content: ComposedAnnotationView(image: screenshot, shapes: shapes, scale: scale)
+            content: ComposedAnnotationView(image: screenshot, shapes: shapes, lineWidthScale: lineWidthScale)
         )
         renderer.scale = 1
         return renderer.nsImage
